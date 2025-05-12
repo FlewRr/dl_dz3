@@ -52,7 +52,7 @@ class TransformerRetriever:
             return query_vectors, document_vectors
 
     def retrieve(self, dataset: Dataset, return_indices: bool=True):
-        self._data = torch.utils.data.DataLoader(dataset, batch_size=self._config.batch_size, shuffle=False, pin_memory=True, persistent_workers=False,
+        self._data = torch.utils.data.DataLoader(dataset, batch_size=self._config.trainer.batch_size, shuffle=False, pin_memory=True, persistent_workers=False,
                                       collate_fn=RetrievalCollator())
 
         query_vectors, document_vectors = self._vectorize()
