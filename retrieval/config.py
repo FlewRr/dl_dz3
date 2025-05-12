@@ -60,7 +60,6 @@ class TrainerConfig(BaseModel):
     shuffle_train_dataset: bool
     num_workers: int
     seed: int
-    device: str
 
     optimizer: AnyOptimizerConfig
     scheduler: AnySchedulerConfig

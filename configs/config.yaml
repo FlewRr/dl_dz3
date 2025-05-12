@@ -21,7 +21,6 @@ trainer:
   eval_steps: 100
   save_steps: 100
   log_with: "aim"
-  device: "cpu"
 
 max_length: 512
 base_model: "intfloat/multilingual-e5-base"

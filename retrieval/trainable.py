@@ -26,9 +26,9 @@ class RetrievalTrainable(Trainable):
 
     def forward_pass(self, model: nn.Module, model_inputs) -> tuple[torch.Tensor, Any]:
         if self._loss_name == "TripletLoss":
-            positive = model_inputs['positive']["input_ids"].to(self._config.device), model_inputs['positive']["attention_mask"].to(self._config.device)
-            negative = model_inputs['negative']["input_ids"].to(self._config.device), model_inputs['negative']["attention_mask"].to(self._config.device)
-            anchor = model_inputs['anchor']["input_ids"].to(self._config.device), model_inputs['anchor']["attention_mask"].to(self._config.device)
+            positive = model_inputs['positive']["input_ids"], model_inputs['positive']["attention_mask"]
+            negative = model_inputs['negative']["input_ids"], model_inputs['negative']["attention_mask"]
+            anchor = model_inputs['anchor']["input_ids"], model_inputs['anchor']["attention_mask"]
 
             vectors_positive = model(*positive)
             vectors_negative = model(*negative)
@@ -39,9 +39,9 @@ class RetrievalTrainable(Trainable):
             return loss, {"loss": loss.item()}
 
         elif self._loss_name == "ContrastiveLoss":
-            labels = model_inputs["labels"].to(self._config.device)
-            x1 = model_inputs["x1"]["input_ids"].to(self._config.device), model_inputs["x1"]["attention_masks"].to(self._config.device)
-            x2 = model_inputs["x2"]["input_ids"].to(self._config.device), model_inputs["x2"]["attention_mask"].to(self._config.device)
+            labels = model_inputs["labels"]
+            x1 = model_inputs["x1"]["input_ids"], model_inputs["x1"]["attention_masks"]
+            x2 = model_inputs["x2"]["input_ids"], model_inputs["x2"]["attention_mask"]
 
             x1 = model(*x1)
             x2 = model(*x2)

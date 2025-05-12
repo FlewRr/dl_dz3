@@ -33,7 +33,7 @@ class Trainable(ABC):
 class Trainer:
     def __init__(self, config: TrainerConfig, model: nn.Module, trainable: Trainable, collator):
         self._config = config
-        self._model = model.to(self._config.device)
+        self._model = model
         self._trainable = trainable
         self._collator = collator
 
@@ -100,6 +100,7 @@ class Trainer:
             accelerator: Accelerator,
             pbar: tqdm
     ):
+        model = model
         model.train()
         metrics = None
 
