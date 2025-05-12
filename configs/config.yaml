@@ -21,7 +21,8 @@ trainer:
   eval_steps: 100
   save_steps: 100
   log_with: "aim"
-device: "cpu"
+  device: "cpu"
+
 max_length: 512
 base_model: "intfloat/multilingual-e5-base"
 dataset: "sentence-transformers/natural-questions"

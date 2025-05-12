@@ -60,6 +60,7 @@ class TrainerConfig(BaseModel):
     shuffle_train_dataset: bool
     num_workers: int
     seed: int
+    device: str
 
     optimizer: AnyOptimizerConfig
     scheduler: AnySchedulerConfig
@@ -68,7 +69,6 @@ class TrainerConfig(BaseModel):
 
 class RetrievalConfig(BaseModel):
     trainer: TrainerConfig
-    device: str
     max_length: int
     base_model: str
     dataset: str

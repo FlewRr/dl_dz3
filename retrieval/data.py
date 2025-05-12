@@ -9,19 +9,19 @@ from retrieval.config import RetrievalConfig
 
 
 class RetrievalDataset(torch.utils.data.Dataset):
-    def __init__(self, dataset: Dataset, test: bool=False, use_contrastive_format: bool=False):
+    def __init__(self, dataset: Dataset, config: RetrievalConfig, test: bool=False, use_contrastive_format: bool=False):
         self._dataset = dataset
         # TODO: config
         self._tokenizer = AutoTokenizer.from_pretrained("intfloat/multilingual-e5-base")
         self._test = test
+        self._config = config
         self._use_contrastive_format = use_contrastive_format
 
     def __len__(self):
         return len(self._dataset)
 
     def _tokenize(self, text: str) -> dict:
-        # TODO: from config max_length
-        encoding = self._tokenizer(text, max_length=512).encodings[0]
+        encoding = self._tokenizer(text, max_length=self._config.max_length, truncation=True).encodings[0]
 
         return {
             'input_ids': torch.tensor(encoding.ids, dtype=torch.long),
@@ -49,7 +49,7 @@ class RetrievalDataset(torch.utils.data.Dataset):
                 "anchor":  self._tokenize(anchor_document)
             }
         else:
-            if self._use_contrastive_format:
+            if self._config.use_contrastive_format:
                 return [
                     {"x1": self._tokenize(anchor_document), "x2": self._tokenize(positive_query), "label": 1.0},
                     {"x1": self._tokenize(anchor_document), "x2": self._tokenize(negative_query), "label": 0.0}
@@ -99,7 +99,7 @@ def load_data(config: RetrievalConfig, test: bool):
     data = data.train_test_split(test_size=0.02, seed=42, shuffle=True)
 
     if test:
-        return RetrievalDataset(data["test"], test=test)
+        return RetrievalDataset(data["test"], config, test=test)
     else:
-        return RetrievalDataset(data["train"], test=test, use_contrastive_format=config.use_contrastive_format),\
-               RetrievalDataset(data["test"], test=test, use_contrastive_format=config.use_contrastive_format)
+        return RetrievalDataset(data["train"], config, test=test),\
+               RetrievalDataset(data["test"], config, test=test)

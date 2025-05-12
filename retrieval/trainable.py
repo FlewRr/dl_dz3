@@ -16,13 +16,13 @@ class RetrievalTrainable(Trainable):
 
 
     def _setup_loss(self):
-        match self._config.trainer.loss:
+        match self._config.loss:
             case TripletLossConfig():
-                return "TripletLoss", TripletMarginLoss(margin=self._config.trainer.loss.similarity_margin)
+                return "TripletLoss", TripletMarginLoss(margin=self._config.loss.similarity_margin)
             case ContrastiveLossConfig():
-                return "ContrastiveLoss", CosineEmbeddingLoss(margin=self._config.trainer.loss.similarity_margin)
+                return "ContrastiveLoss", CosineEmbeddingLoss(margin=self._config.loss.similarity_margin)
             case _:
-                raise ValueError(f'Optimizer {self._config.optimizer} is not supported')
+                raise ValueError(f'Optimizer {self._config.loss} is not supported')
 
     def forward_pass(self, model: nn.Module, model_inputs) -> tuple[torch.Tensor, Any]:
         if self._loss_name == "TripletLoss":
