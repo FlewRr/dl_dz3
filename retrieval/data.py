@@ -31,7 +31,7 @@ class RetrievalDataset(torch.utils.data.Dataset):
         }
 
     def __getitem__(self, idx: int):
-        if not self._config.hard_negatives:
+        if not self.cosine_sims or not self._config.hard_negatives:
             positive_pair = self._dataset[idx]
             positive_query = self._config.query_prefix + positive_pair["query"]
             anchor_document = self._config.document_prefix + positive_pair["answer"]
