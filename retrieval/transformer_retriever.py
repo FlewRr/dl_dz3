@@ -56,7 +56,7 @@ class TransformerRetriever:
                                       collate_fn=RetrievalCollator())
 
         query_vectors, document_vectors = self._vectorize()
-        sims = query_vectors @ document_vectors.T
+        sims = query_vectors.cpu().detach() @ document_vectors.cpu().detach().T
 
         if return_indices:
             return sims.sort(dim=1, descending=True).indices
