@@ -28,3 +28,4 @@ dataset: "sentence-transformers/natural-questions"
 query_prefix: "query: "
 document_prefix: "passage: "
 use_contrastive_format: False
+hard_negatives: False

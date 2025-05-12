@@ -22,7 +22,7 @@ def main(config_path: Path):
 
     sims = None
     if config.hard_negatives:
-        transformer = TransformerRetriever(config)
+        transformer = TransformerRetriever(config.trainer)
 
         train_dataset, val_dataset = load_data(config, test=False)
 
