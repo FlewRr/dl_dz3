@@ -40,7 +40,7 @@ class RetrievalTrainable(Trainable):
 
         elif self._loss_name == "ContrastiveLoss":
             labels = model_inputs["labels"]
-            x1 = model_inputs["x1"]["input_ids"], model_inputs["x1"]["attention_masks"]
+            x1 = model_inputs["x1"]["input_ids"], model_inputs["x1"]["attention_mask"]
             x2 = model_inputs["x2"]["input_ids"], model_inputs["x2"]["attention_mask"]
 
             x1 = model(*x1)
