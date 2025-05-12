@@ -48,7 +48,6 @@ class ContrastiveLossConfig(BaseLossConfig):
 AnyLossConfig = Annotated[TripletLossConfig | ContrastiveLossConfig, Field(discriminator='loss')]
 
 class TrainerConfig(BaseModel):
-    device: str
     num_epochs: int
     gradient_accumulation_steps: int
     project_dir: str
@@ -66,8 +65,10 @@ class TrainerConfig(BaseModel):
     scheduler: AnySchedulerConfig
     loss: AnyLossConfig
 
+
 class RetrievalConfig(BaseModel):
     trainer: TrainerConfig
+    device: str
     max_length: int
     base_model: str
     dataset: str
