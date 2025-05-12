@@ -74,3 +74,4 @@ class RetrievalConfig(BaseModel):
     query_prefix: str
     document_prefix: str
     use_contrastive_format: bool
+    hard_negatives: Optional[bool] = False

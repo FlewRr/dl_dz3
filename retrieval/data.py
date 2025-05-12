@@ -9,13 +9,14 @@ from retrieval.config import RetrievalConfig
 
 
 class RetrievalDataset(torch.utils.data.Dataset):
-    def __init__(self, dataset: Dataset, config: RetrievalConfig, test: bool=False, use_contrastive_format: bool=False):
+    def __init__(self, dataset: Dataset, config: RetrievalConfig, test: bool=False, cosine_sims: torch.Tensor=None):
         self._dataset = dataset
-        # TODO: config
         self._tokenizer = AutoTokenizer.from_pretrained("intfloat/multilingual-e5-base")
         self._test = test
         self._config = config
-        self._use_contrastive_format = use_contrastive_format
+
+        if self._config.hard_negatives and cosine_sims:
+            self.cosine_sims = cosine_sims
 
     def __len__(self):
         return len(self._dataset)
@@ -30,18 +31,33 @@ class RetrievalDataset(torch.utils.data.Dataset):
         }
 
     def __getitem__(self, idx: int):
-        positive_pair = self._dataset[idx]
+        if not self._config.hard_negatives:
+            positive_pair = self._dataset[idx]
+            positive_query = self._config.query_prefix + positive_pair["query"]
+            anchor_document = self._config.document_prefix + positive_pair["answer"]
 
-        if not self._test:
-            neg_idx = idx
-            while neg_idx == idx:
-                neg_idx = random.randint(0, len(self._dataset) - 1)
-            negative_pair = self._dataset[neg_idx]
-            # self._config.query_prefix)
-            negative_query = "query: " + negative_pair["query"]
-            # self._config.query_prefix
-        positive_query = "query: " + positive_pair["query"]
-        anchor_document = "passage" + positive_pair["answer"]
+            if not self._test:
+                neg_idx = idx
+                while neg_idx == idx:
+                    neg_idx = random.randint(0, len(self._dataset) - 1)
+                negative_pair = self._dataset[neg_idx]
+                negative_query = self._config.query_prefix + negative_pair["query"]
+        else:
+            positive_pair = self._dataset[idx]
+            positive_query = self._config.query_prefix + positive_pair["query"]
+            anchor_document = self._config.document_prefix + positive_pair["answer"]
+
+            if not self._test:
+                sims = self.cosine_sims[idx]
+
+                positive_answer_idx = self._answer_ids[idx]  # assuming this is stored: List[int]
+                topk = torch.argsort(sims, descending=True)
+
+                for neg_idx in topk:
+                    if neg_idx != positive_answer_idx:
+                        negative_pair = self._dataset[idx]
+                        break
+                negative_query = self._config.query_prefix + negative_pair["query"]
 
         if self._test:
             return {
@@ -94,12 +110,16 @@ class RetrievalCollator:
         return out_dict
 
 
-def load_data(config: RetrievalConfig, test: bool):
+def load_data(config: RetrievalConfig, test: bool, sims: tuple[torch.Tensor, torch.Tensor]=None):
     data = load_dataset("sentence-transformers/natural-questions")["train"]
     data = data.train_test_split(test_size=0.2, seed=42, shuffle=True)
 
     if test:
         return RetrievalDataset(data["test"], config, test=test)
     else:
+        if sims:
+            return  RetrievalDataset(data["train"], config, test=test, cosine_sims=sims[0]),\
+               RetrievalDataset(data["test"], config, test=test, cosine_sims=sims[1])
+
         return RetrievalDataset(data["train"], config, test=test),\
                RetrievalDataset(data["test"], config, test=test)

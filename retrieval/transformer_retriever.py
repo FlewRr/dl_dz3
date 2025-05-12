@@ -20,8 +20,11 @@ class RetrievalModel(nn.Module):
         return F.normalize(outputs.pooler_output, dim=-1)
 
 class TransformerRetriever:
-    def __init__(self, config: RetrievalConfig):
-        self._model = RetrievalModel(config)
+    def __init__(self, config: RetrievalConfig, model: nn.Module=None):
+        if not model:
+            self._model = RetrievalModel(config)
+        else:
+            self._model = model
         self._config = config
         self._accelarator = Accelerator()
         self._data = None
@@ -48,15 +51,14 @@ class TransformerRetriever:
 
             return query_vectors, document_vectors
 
-    def retrieve(self, dataset: Dataset):
+    def retrieve(self, dataset: Dataset, return_indices: bool=True):
         self._data = torch.utils.data.DataLoader(dataset, batch_size=self._config.batch_size, shuffle=False, pin_memory=True, persistent_workers=False,
                                       collate_fn=RetrievalCollator())
 
         query_vectors, document_vectors = self._vectorize()
         sims = query_vectors @ document_vectors.T
-        sims_idx = sims.sort(dim=1, descending=True).indices
 
-        return sims_idx
+        if return_indices:
+            return sims.sort(dim=1, descending=True).indices
 
-    def parameters(self):
-        return self._model.parameters()
+        return sims
