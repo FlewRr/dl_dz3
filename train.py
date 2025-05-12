@@ -14,8 +14,6 @@ def main(config_path: Path):
         data = yaml.safe_load(f)
 
     config = RetrievalConfig(**data)
-    trainable = RetrievalTrainable(config)
-
     transformer = RetrievalModel(config)
 
     trainable = RetrievalTrainable(config.trainer)
