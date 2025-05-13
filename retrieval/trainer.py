@@ -117,7 +117,6 @@ class Trainer:
                     )
 
                 metrics = self._create_metrics(accelerator)
-                print("Train metircs:", metrics.compute().item()s)
             with accelerator.accumulate():
 
                 loss_value, outputs = self._trainable.forward_pass(model, minibatch)
@@ -131,6 +130,7 @@ class Trainer:
                     current_global_optimizer_step != 0 and \
                     current_global_optimizer_step % self._config.eval_steps == 0:
                 self._eval_loop_iter(dataloader_eval, model, accelerator, current_global_optimizer_step)
+                print("\nTrain metrics:", metrics.compute().item(), "\n")
             if accelerator.sync_gradients and current_global_optimizer_step != 0 and current_global_optimizer_step % self._config.save_steps == 0:
                 accelerator.save_model(model, Path(self._config.project_dir) / f'save-{current_global_optimizer_step}')
             pbar.update(1)
@@ -157,7 +157,7 @@ class Trainer:
                 loss_value, outputs = self._trainable.forward_pass(model, minibatch)
                 self._trainable.update_metrics(outputs, metrics)
 
-            print("Val metircs:", metrics.compute().item())
+            print("\nVal metircs:", metrics.compute().item(), "\n")
 
             self._compute_and_log_metrics(
                 prefix='step/eval/',
