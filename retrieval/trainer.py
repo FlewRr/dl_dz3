@@ -117,7 +117,7 @@ class Trainer:
                     )
 
                 metrics = self._create_metrics(accelerator)
-
+                print("Train metircs:", metrics)
             with accelerator.accumulate():
 
                 loss_value, outputs = self._trainable.forward_pass(model, minibatch)
@@ -156,6 +156,8 @@ class Trainer:
             for minibatch in dataloader:
                 loss_value, outputs = self._trainable.forward_pass(model, minibatch)
                 self._trainable.update_metrics(outputs, metrics)
+
+            print("Val metircs:", metrics)
 
             self._compute_and_log_metrics(
                 prefix='step/eval/',
