@@ -1,4 +1,5 @@
 import click
+import os
 from pathlib import Path
 from retrieval.trainable import RetrievalTrainable
 from retrieval.config import RetrievalConfig
@@ -6,11 +7,13 @@ from retrieval.transformer_retriever import TransformerRetriever, RetrievalModel
 from retrieval.trainer import Trainer
 from retrieval.data import RetrievalCollator, load_data
 import torch
+import wandb
 import yaml
 
 @click.command()
 @click.option('--config-path', type=Path, required=True)
-def main(config_path: Path):
+@click.option("--wandb_key", type=str, required=False)
+def main(config_path: Path,wandb_key: str = ""):
     with open(config_path, "r") as f:
         data = yaml.safe_load(f)
 
@@ -35,9 +38,19 @@ def main(config_path: Path):
         torch.save(train_sims, "train_sims.pt")
         torch.save(val_sims, "val_sims.pt")
 
+    if config.use_wandb:
+        if not wandb_key:
+            raise RuntimeError("Wandb usage is turned on but wandb key wasn't passed.")
+
+        os.environ['WANDB_API_KEY'] = wandb_key
+        wandb.login()
+
+        wandb.init(
+            project=f"{config.trainer.experiment_name}",
+            name=f"{config.trainer.experiment_name_run}")
+
     train_dataset, val_dataset = load_data(config, test=False, sims=sims)
     trainer.train(train_dataset, val_dataset)
 
 if __name__ == "__main__":
     main()
-    print(1)

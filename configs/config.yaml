@@ -21,6 +21,7 @@ trainer:
   eval_steps: 100
   save_steps: 100
   log_with: "aim"
+  use_wandb: True
 
 max_length: 512
 base_model: "intfloat/multilingual-e5-base"

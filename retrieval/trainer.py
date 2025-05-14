@@ -15,6 +15,7 @@ from torch.optim import Optimizer, SGD, Adam, AdamW
 from torch.optim.lr_scheduler import LRScheduler
 from retrieval.config import TrainerConfig, SGDConfig, AdamConfig, AdamWConfig, ConstantSchedulerConfig, \
     LinearWarmupSchedulerConfig
+import wandb
 
 class Trainable(ABC):
     @abstractmethod
@@ -116,6 +117,9 @@ class Trainer:
                         current_step=current_global_optimizer_step
                     )
 
+                    if self._config.use_wandb:
+                        wandb.log(metrics)
+
                 metrics = self._create_metrics(accelerator)
             with accelerator.accumulate():
 
@@ -155,7 +159,7 @@ class Trainer:
             for minibatch in dataloader:
                 loss_value, outputs = self._trainable.forward_pass(model, minibatch)
                 self._trainable.update_metrics(outputs, metrics)
-                
+
             self._compute_and_log_metrics(
                 prefix='step/eval/',
                 accelerator=accelerator,
