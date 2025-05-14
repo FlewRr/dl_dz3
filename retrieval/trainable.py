@@ -56,4 +56,7 @@ class RetrievalTrainable(Trainable):
         }
 
     def update_metrics(self, model_outputs, metrics: dict[str, torchmetrics.Metric]):
-        metrics['loss'].update(model_outputs['loss'])
+        if "loss" in metrics:
+            metrics['loss'].update(model_outputs['loss'])
+        else:
+            metrics["loss"] = 0.0
