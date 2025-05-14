@@ -119,7 +119,7 @@ class Trainer:
 
                     if self._config.use_wandb:
                         wandb_metrics = metrics
-                        wandb_metrics["loss"] = wandb_metrics["loss"].compute().item()
+                        wandb_metrics["train_loss"] = wandb_metrics["loss"].compute().item()
 
                         wandb.log(wandb_metrics)
 
@@ -169,6 +169,12 @@ class Trainer:
                 metrics=metrics,
                 current_step=current_iter
             )
+
+            if self._config.use_wandb:
+                wandb_metrics = metrics
+                wandb_metrics["val_loss"] = wandb_metrics["loss"].compute().item()
+
+                wandb.log(wandb_metrics)
 
             model.train()
 
