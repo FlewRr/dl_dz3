@@ -47,7 +47,7 @@ def main(config_path: Path,wandb_key: str = ""):
 
         wandb.init(
             project=f"{config.trainer.experiment_name}",
-            name=f"{config.trainer.experiment_name_run}")
+            name=f"{config.trainer.experiment_name}" + "_run}")
 
     train_dataset, val_dataset = load_data(config, test=False, sims=sims)
     trainer.train(train_dataset, val_dataset)
