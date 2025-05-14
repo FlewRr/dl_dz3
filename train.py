@@ -38,7 +38,7 @@ def main(config_path: Path,wandb_key: str = ""):
         torch.save(train_sims, "train_sims.pt")
         torch.save(val_sims, "val_sims.pt")
 
-    if config.use_wandb:
+    if config.trainer.use_wandb:
         if not wandb_key:
             raise RuntimeError("Wandb usage is turned on but wandb key wasn't passed.")
 
