@@ -118,7 +118,10 @@ class Trainer:
                     )
 
                     if self._config.use_wandb:
-                        wandb.log(metrics)
+                        wandb_metrics = metrics
+                        wandb_metrics["loss"] = wandb_metrics["loss"].compute().item()
+
+                        wandb.log(wandb_metrics)
 
                 metrics = self._create_metrics(accelerator)
             with accelerator.accumulate():
