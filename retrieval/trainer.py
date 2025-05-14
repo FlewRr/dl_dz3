@@ -155,7 +155,7 @@ class Trainer:
             for minibatch in dataloader:
                 loss_value, outputs = self._trainable.forward_pass(model, minibatch)
                 self._trainable.update_metrics(outputs, metrics)
-s
+                
             self._compute_and_log_metrics(
                 prefix='step/eval/',
                 accelerator=accelerator,
