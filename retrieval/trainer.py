@@ -108,36 +108,33 @@ class Trainer:
         for i, minibatch in enumerate(dataloader):
             current_global_step = epoch_i * len(dataloader) + i
             current_global_optimizer_step = current_global_step // self._config.gradient_accumulation_steps
-            if accelerator.sync_gradients and current_global_optimizer_step % self._config.log_steps == 0:
-                if metrics is not None:
-                    self._compute_and_log_metrics(
-                        prefix='step/train/',
-                        accelerator=accelerator,
-                        metrics=metrics,
-                        current_step=current_global_optimizer_step
-                    )
 
-                    if self._config.use_wandb:
-                        wandb_metrics = {"train_loss": metrics["loss"].compute().item()}
-
-                        wandb.log(wandb_metrics)
-
-                metrics = self._create_metrics(accelerator)
+            train_loss = 0.
             with accelerator.accumulate():
-
                 loss_value, outputs = self._trainable.forward_pass(model, minibatch)
-                self._trainable.update_metrics(outputs, metrics)
+                train_loss += loss_value
+
                 accelerator.backward(loss_value)
                 optimizer.step()
                 scheduler.step()
                 optimizer.zero_grad()
 
+            train_loss /= len(dataloader)
+
+            if self._config.use_wandb:
+                wandb_metrics = {"train_loss": metrics["loss"].compute().item()}
+
+                wandb.log(wandb_metrics)
+
             if accelerator.sync_gradients and \
                     current_global_optimizer_step != 0 and \
                     current_global_optimizer_step % self._config.eval_steps == 0:
                 self._eval_loop_iter(dataloader_eval, model, accelerator, current_global_optimizer_step)
-            if accelerator.sync_gradients and current_global_optimizer_step != 0 and current_global_optimizer_step % self._config.save_steps == 0:
+            # if accelerator.sync_gradients
+            if current_global_optimizer_step != 0 and current_global_optimizer_step % self._config.save_steps == 0:
                 accelerator.save_model(model, Path(self._config.project_dir) / f'save-{current_global_optimizer_step}')
+                wandb.save(Path(self._config.project_dir) / f'save-{current_global_optimizer_step}')
+
             pbar.update(1)
 
     def _create_metrics(self, accelerator: Accelerator):
@@ -158,16 +155,14 @@ class Trainer:
 
             metrics = self._create_metrics(accelerator)
 
+            val_loss = 0.
             for minibatch in dataloader:
+                #TODO: delete outputs
                 loss_value, outputs = self._trainable.forward_pass(model, minibatch)
-                self._trainable.update_metrics(outputs, metrics)
 
-            self._compute_and_log_metrics(
-                prefix='step/eval/',
-                accelerator=accelerator,
-                metrics=metrics,
-                current_step=current_iter
-            )
+                val_loss += loss_value
+
+            val_loss /= len(dataloader)
 
             if self._config.use_wandb:
                 wandb_metrics = {"val_loss": metrics["loss"].compute().item()}
