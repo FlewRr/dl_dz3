@@ -122,7 +122,7 @@ class Trainer:
             train_loss /= len(dataloader)
 
             if self._config.use_wandb:
-                wandb_metrics = {"train_loss": metrics["loss"].compute().item()}
+                wandb_metrics = {"train_loss": train_loss}
 
                 wandb.log(wandb_metrics)
 
@@ -165,7 +165,7 @@ class Trainer:
             val_loss /= len(dataloader)
 
             if self._config.use_wandb:
-                wandb_metrics = {"val_loss": metrics["loss"].compute().item()}
+                wandb_metrics = {"val_loss": val_loss}
 
                 wandb.log(wandb_metrics)
 
