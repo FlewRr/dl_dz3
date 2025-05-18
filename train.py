@@ -35,8 +35,8 @@ def main(config_path: Path,wandb_key: str = ""):
 
         sims = (train_sims, val_sims)
 
-        # torch.save(train_sims, "train_sims.pt")
-        # torch.save(val_sims, "val_sims.pt")
+        torch.save(train_sims, "train_sims.pt")
+        torch.save(val_sims, "val_sims.pt")
 
     if config.trainer.use_wandb:
         if not wandb_key:
