@@ -153,8 +153,6 @@ class Trainer:
         with torch.no_grad():
             model.eval()
 
-            metrics = self._create_metrics(accelerator)
-
             val_loss = 0.
             for minibatch in dataloader:
                 #TODO: delete outputs
