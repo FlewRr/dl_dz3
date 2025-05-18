@@ -111,8 +111,9 @@ class RetrievalCollator:
         return out_dict
 
 
-def load_data(config: RetrievalConfig, test: bool, sims: tuple[torch.Tensor, torch.Tensor]=None):
+def load_data(config: RetrievalConfig, test: bool, sims: tuple[torch.Tensor, torch.Tensor]=None, scale=1.0):
     data = load_dataset("sentence-transformers/natural-questions")["train"]
+    data = data[:len(data) * scale]
     data = data.train_test_split(test_size=0.2, seed=42, shuffle=True)
 
     if test:
