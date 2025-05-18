@@ -16,7 +16,7 @@ class RetrievalDataset(torch.utils.data.Dataset):
         self._config = config
 
         self.cosine_sims = None
-        if self._config.hard_negatives and cosine_sims:
+        if self._config.hard_negatives and cosine_sims is not None:
             self.cosine_sims = cosine_sims
 
     def __len__(self):
