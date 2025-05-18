@@ -30,8 +30,8 @@ def main(config_path: Path,wandb_key: str = ""):
 
         train_dataset, val_dataset = load_data(config, test=False, scale=0.5)
 
-        train_sims = transformer.retrieve(train_dataset[:5000], return_indices=False)
-        val_sims = transformer.retrieve(val_dataset[:1000], return_indices=False)
+        train_sims = transformer.retrieve(train_dataset, return_indices=False)
+        val_sims = transformer.retrieve(val_dataset, return_indices=False)
 
         sims = (train_sims, val_sims)
 
