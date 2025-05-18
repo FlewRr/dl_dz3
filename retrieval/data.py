@@ -51,7 +51,7 @@ class RetrievalDataset(torch.utils.data.Dataset):
             if not self._test:
                 sims = self.cosine_sims[idx]
 
-                positive_answer_idx = self._answer_ids[idx]  # assuming this is stored: List[int]
+                positive_answer_idx = self._dataset[idx]  # assuming this is stored: List[int]
                 topk = torch.argsort(sims, descending=True)
 
                 for neg_idx in topk:
