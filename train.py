@@ -28,7 +28,7 @@ def main(config_path: Path,wandb_key: str = ""):
     if config.hard_negatives:
         transformer = TransformerRetriever(config)
 
-        train_dataset, val_dataset = load_data(config, test=False, scale=0.5)
+        train_dataset, val_dataset = load_data(config, test=False)
 
         train_sims = transformer.retrieve(train_dataset, return_indices=False)
         val_sims = transformer.retrieve(val_dataset, return_indices=False)
