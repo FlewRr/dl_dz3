@@ -103,7 +103,6 @@ class Trainer:
     ):
         model = model
         model.train()
-        metrics = None
 
         for i, minibatch in enumerate(dataloader):
             current_global_step = epoch_i * len(dataloader) + i
