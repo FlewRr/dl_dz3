@@ -30,8 +30,8 @@ def main(config_path: Path,wandb_key: str = ""):
 
         train_dataset, val_dataset = load_data(config, test=False)
 
-        train_sims = transformer.retrieve(train_dataset, return_indices=False)
-        val_sims = transformer.retrieve(val_dataset, return_indices=False)
+        train_sims = transformer.retrieve(train_dataset, return_indices=False, scale=0.7)
+        val_sims = transformer.retrieve(val_dataset, return_indices=False, scale=0.7)
 
         sims = (train_sims, val_sims)
 
@@ -49,7 +49,7 @@ def main(config_path: Path,wandb_key: str = ""):
             project=f"{config.trainer.experiment_name}",
             name=f"{config.trainer.experiment_name}" + "_run")
 
-    train_dataset, val_dataset = load_data(config, test=False, sims=sims)
+    train_dataset, val_dataset = load_data(config, test=False, sims=sims, scale=0.7)
     trainer.train(train_dataset, val_dataset)
 
 if __name__ == "__main__":
